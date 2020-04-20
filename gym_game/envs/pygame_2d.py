@@ -28,7 +28,7 @@ class Car:
         for d in range(-90, 120, 45):
             self.check_radar(d)
 
-        for d in range(-90, 105, 15):
+        for d in range(-90, 120, 45):
             self.check_radar_for_draw(d)
 
     def draw(self, screen):
@@ -58,7 +58,7 @@ class Car:
         x = int(self.center[0] + math.cos(math.radians(360 - (self.angle + degree))) * len)
         y = int(self.center[1] + math.sin(math.radians(360 - (self.angle + degree))) * len)
 
-        while not self.map.get_at((x, y)) == (255, 255, 255, 255) and len < 200:
+        while not self.map.get_at((x, y)) == (255, 255, 255, 255) and len < 300:
             len = len + 1
             x = int(self.center[0] + math.cos(math.radians(360 - (self.angle + degree))) * len)
             y = int(self.center[1] + math.sin(math.radians(360 - (self.angle + degree))) * len)
@@ -72,7 +72,7 @@ class Car:
         x = int(self.center[0] + math.cos(math.radians(360 - (self.angle + degree))) * len)
         y = int(self.center[1] + math.sin(math.radians(360 - (self.angle + degree))) * len)
 
-        while not self.map.get_at((x, y)) == (255, 255, 255, 255) and len < 2000:
+        while not self.map.get_at((x, y)) == (255, 255, 255, 255) and len < 300:
             len = len + 1
             x = int(self.center[0] + math.cos(math.radians(360 - (self.angle + degree))) * len)
             y = int(self.center[1] + math.sin(math.radians(360 - (self.angle + degree))) * len)
@@ -129,15 +129,14 @@ class Car:
         right_bottom = [self.center[0] + math.cos(math.radians(360 - (self.angle + 330))) * len, self.center[1] + math.sin(math.radians(360 - (self.angle + 330))) * len]
         self.four_points = [left_top, right_top, left_bottom, right_bottom]
 
-class PyRace2D:
-    def __init__(self, is_render = True):
+class PyGame2D:
+    def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((screen_width, screen_height))
         self.clock = pygame.time.Clock()
         self.font = pygame.font.SysFont("Arial", 30)
         self.car = Car('car.png', 'map.png', [700, 650])
         self.game_speed = 60
-        self.is_render = is_render
         self.mode = 0
 
     def action(self, action):
@@ -182,12 +181,10 @@ class PyRace2D:
         # return state
         radars = self.car.radars
         ret = [0, 0, 0, 0, 0]
-        i = 0
-        for r in radars:
-            ret[i] = int(r[1] / 20)
-            i += 1
+        for i, r in enumerate(radars):
+            ret[i] = int(r[1] / 30)
 
-        return ret
+        return tuple(ret)
 
     def view(self):
         # draw game
@@ -206,8 +203,9 @@ class PyRace2D:
             self.screen.fill((0, 0, 0))
 
         self.car.radars_for_draw.clear()
-        for d in range(-90, 105, 15):
+        for d in range(-90, 120, 45):
             self.car.check_radar_for_draw(d)
+
         pygame.draw.circle(self.screen, (255, 255, 0), check_point[self.car.current_check], 70, 1)
         self.car.draw_collision(self.screen)
         self.car.draw_radar(self.screen)

@@ -7,6 +7,7 @@ import gym
 import gym_game
 
 def simulate():
+    global epsilon, epsilon_decay
     for episode in range(MAX_EPISODES):
 
         # Init environment
@@ -27,11 +28,11 @@ def simulate():
             total_reward += reward
 
             # Get correspond q value from state, action pair
-            q_value = q_table[state, action]
+            q_value = q_table[state][action]
             best_q = np.max(q_table[next_state])
 
             # Q(state, action) <- (1 - a)Q(state, action) + a(reward + rmaxQ(next state, all actions))
-            q_table[state, action] = (1 - learning_rate) * q_value + learning_rate * (reward + gamma * best_q)
+            q_table[state][action] = (1 - learning_rate) * q_value + learning_rate * (reward + gamma * best_q)
 
             # Set up for the next iteration
             state = next_state
@@ -57,5 +58,6 @@ if __name__ == "__main__":
     epsilon_decay = 0.999
     learning_rate = 0.1
     gamma = 0.6
-    q_table = np.zeros([env.observation_space.n, env.action_space.n])
+    num_box = tuple((env.observation_space.high + np.ones(env.observation_space.shape)).astype(int))
+    q_table = np.zeros(num_box + (env.action_space.n,))
     simulate()
